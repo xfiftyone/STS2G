@@ -58,7 +58,3 @@ GET
 #### 待补充  
 *上传Webshell功能*  
 *完善webppath打印模块-目前实现一部分*
-#### 参考项目  
-https://github.com/HatBoy/Struts2-Scan  
-#### 测试环境  
-https://github.com/vulhub/vulhub
