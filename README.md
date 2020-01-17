@@ -1,6 +1,27 @@
 # STS2G
-Struts2漏洞扫描Golang版.
-![avatar](./pasted-95.png)  
+Struts2漏洞扫描Golang版，POC参考了众多优秀项目如[Struts2-Scan](https://github.com/HatBoy/Struts2-Scan)，漏洞测试采用[vulhub](https://github.com/vulhub/vulhub/tree/master/struts2).  
+目前两种模式`scan`和`exec`模式支持下列类型：  
+*
+struts2-001
+struts2-003
+struts2-005
+struts2-007
+struts2-008
+struts2-009
+struts2-012
+struts2-013
+struts2-015
+struts2-016
+struts2-045
+struts2-046
+struts2-048
+struts2-053
+struts2-057
+*
+#### 开发目的  
+1、该工具适用于命令行操作模式下，比如webshell下检测内网struts2漏洞.  
+2、Golang可编译Win/Linux可执行文件.  
+3、单文件运行.  
 #### 使用方法  
 ``` 
 NAME:
@@ -23,6 +44,7 @@ GLOBAL OPTIONS:
    --data value  data for special vuln
    --help, -h    show help (default: false)
 ```
+![avatar](./pasted-95.png)  
 ##### 默认扫描模式:  
 ```ST2SG --mode scan --url http://xxx.com/index.action```  
 ##### 指定漏洞扫描模式：  
@@ -36,7 +58,8 @@ POST
 GET  
 ```ST2SG --mode scan --url http://xxx.com/index.action --vn 009 --data "name"```  
 #### 待补充  
-*上传Webshell功能*
+*上传Webshell功能*  
+*完善webppath打印模块-目前实现一部分*
 #### 参考项目  
 https://github.com/HatBoy/Struts2-Scan  
 #### 测试环境  
