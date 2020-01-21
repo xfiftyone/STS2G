@@ -2,7 +2,6 @@ package main
 
 import (
 	"ST2G/cvemod/s001"
-	"ST2G/cvemod/s003"
 	"ST2G/cvemod/s005"
 	"ST2G/cvemod/s007"
 	"ST2G/cvemod/s008"
@@ -16,7 +15,7 @@ import (
 	"ST2G/cvemod/s048"
 	"ST2G/cvemod/s053"
 	"ST2G/cvemod/s057"
-	"ST2G/cvemod/x51utils"
+	"ST2G/cvemod/utils"
 	"fmt"
 	"github.com/urfave/cli/v2"
 	"log"
@@ -31,7 +30,9 @@ func main() {
 	var data string
 	app := &cli.App{
 		Name:"ST2SG",
-		Usage:"Struts2漏洞检测工具(Golang版)",
+		Usage:"Struts2 Scanner Written in Golang",
+		UsageText:"" +
+			"ST2SG --url http://xxxxxxx.com/test.action --vn 15 --mode scan ",
 		Authors: []*cli.Author{
 			&cli.Author{
 				Name:  "x51",
@@ -41,7 +42,7 @@ func main() {
 		Flags: []cli.Flag {
 			&cli.StringFlag{
 				Name:        "mode",
-				Usage:       "specify working mode",
+				Usage:       "Specify work mode",
 				Destination: &mode,
 			},
 			&cli.IntFlag{
@@ -53,17 +54,17 @@ func main() {
 			},
 			&cli.StringFlag{
 				Name:        "url",
-				Usage:       "set target url",
+				Usage:       "Set target url",
 				Destination: &url,
 			},
 			&cli.StringFlag{
 				Name:        "cmd",
-				Usage:       "exec command(only work on exploit mode)",
+				Usage:       "Exec command(Only works on mode exec.)",
 				Destination: &cmd,
 			},
 			&cli.StringFlag{
 				Name:        "data",
-				Usage:       "data for special vuln",
+				Usage:       "Specific vulnerability packets",
 				Destination: &data,
 			},
 
@@ -79,31 +80,29 @@ func main() {
 							 if  data !=""{
 								 s001.Check(url,data)
 							 }else {
-								 fmt.Println("s001须指定POST数据包内容，并用<fuckit>标记出测试点，如: --post=\"user=a&pass=fuckit\"")
+								 fmt.Println("s001须指定POST数据包内容，并用<fuckit>标记出测试点，如: --data \"user=a&pass=fuckit\"")
 							 }
-				 		 case 3:
-				 		 	s003.Check(url)
 						 case 5:
 							s005.Check(url)
 						 case 7:
 							 if  data !=""{
 								 s007.Check(url,data)
 							 }else {
-								 fmt.Println("s007需指定POST数据包内容，并用<fuckit>标记出测试点，如: --post=\"user=a&pass=fuckit\"")
+								 fmt.Println("s007需指定POST数据包内容，并用<fuckit>标记出测试点，如: --data \"user=a&pass=fuckit\"")
 							 }
 				 		 case 8:
 					 		s008.Check(url)
 				 		 case 9:
 							 if  data !=""{
-								 s009.Check(data,url)
+								 s009.Check(url,data)
 							 }else {
-								 fmt.Println("s009需手动指定GET参数，如: --post=\"name\"")
+								 fmt.Println("s009需指定要测试的GET参数，如: --data=\"name\"")
 							 }
 						 case 12:
 							 if  data !=""{
 								 s012.Check(url,data)
 							 }else {
-								 fmt.Println("s012需手动指定POST数据包内容，并用<fuckit>标记出测试点，如: --post=\"user=a&pass=fuckit\"")
+								 fmt.Println("s012需手动指定POST数据包内容，并用<fuckit>标记出测试点，如: --data \"user=a&pass=fuckit\"")
 							 }
 						 case 13:
 							s013.Check(url)
@@ -116,15 +115,22 @@ func main() {
 						 case 46:
 							 s046.Check(url)
 						 case 48:
-							 s048.Check(url,data)
+							 if  data !=""{
+								 s048.Check(url,data)
+							 }else {
+								 fmt.Println("s048需手动指定POST数据包内容，并用<fuckit>标记出测试点，如: --data \"user=a&pass=fuckit\"")
+							 }
 						 case 53:
-							s053.Check(url,data)
+							 if  data !=""{
+								 s053.Check(url,data)
+							 }else {
+								 fmt.Println("s053需手动指定POST数据包内容，并用<fuckit>标记出测试点，如: --data \"user=a&pass=fuckit\"")
+							 }
 						 case 57:
 							s057.Check(url)
 						 case 000:
 							 fmt.Println("未指定漏洞编号,默认全检测")
 							 s001.Check(url,data)
-							 s003.Check(url)
 							 s005.Check(url)
 							 s007.Check(url,data)
 							 s008.Check(url)
@@ -139,8 +145,8 @@ func main() {
 							 s053.Check(url,data)
 							 s057.Check(url)
 						 default:
-							fmt.Println("VN指定错误，目前支持检测：")
-							for _,vnn := range x51utils.Vnlist{
+							fmt.Println("漏洞编号设置错误，目前支持检测：")
+							for _,vnn := range utils.Vnlist{
 								fmt.Println(vnn)
 							}
 				 }
@@ -153,27 +159,25 @@ func main() {
 					 if  data !=""{
 						 s001.ExecCommand(url,cmd,data)
 					 }else {
-						 fmt.Println("s001需手动指定post数据包内容，并用fuckit标记出测试点，如: --post=\"user=a&pass=fuckit\"")
+						 fmt.Println("s001需手动指定POST数据包内容，并用fuckit标记出测试点，如: --data=\"user=a&pass=fuckit\"")
 					 }
-				 case 3:
-					 s003.ExecCommand(url,cmd)
 				 case 5:
 				 	 s005.ExecCommand(url,cmd)
 				 case 7:
 					 if  data !=""{
 						 s007.ExecCommand(url,cmd,data)
 					 }else {
-						 fmt.Println("s007需手动指定post数据包内容，并用fuckit标记出测试点，如: --post=\"user=a&pass=fuckit\"")
+						 fmt.Println("s007需手动指定POST数据包内容，并用fuckit标记出测试点，如: --data=\"user=a&pass=fuckit\"")
 					 }
 				 case 8:
 					 s008.ExecCommand(url,cmd)
 				 case 9:
-					 s009.ExecCommand(data,url,cmd)
+					 s009.ExecCommand(url,cmd,data)
 				 case 12:
 					 if  data!=""{
 						 s012.ExecCommand(url,cmd,data)
 					 }else {
-						 fmt.Println("s012需手动指定post数据包内容，并用<fuckit>标记出测试点，如: --data=\"user=a&pass=fuckit\"")
+						 fmt.Println("s012需手动指定POST数据包内容，并用<fuckit>标记出测试点，如: --data=\"user=a&pass=fuckit\"")
 					 }
 				 case 13:
 					 s013.ExecCommand(url,cmd)
@@ -184,9 +188,13 @@ func main() {
 				 case 45:
 					 s045.ExecCommand(url,cmd)
 				 case 46:
-					 s046.Exec(url,cmd)
+					 s046.ExecCommand(url,cmd)
 				 case 48:
-					 s048.ExecCommand(url,cmd,data)
+					 if  data!=""{
+						 s048.ExecCommand(url,cmd,data)
+					 }else {
+						 fmt.Println("s048需手动指定POST数据包内容，并用<fuckit>标记出测试点，如: --data=\"user=a&pass=fuckit\"")
+					 }
 				 case 53:
 					 if  data !=""{
 						 s053.ExecCommand(url,cmd,data)
@@ -196,9 +204,9 @@ func main() {
 				 case 57:
 				 	s057.ExecCommand(url,cmd)
 				 case 000:
-					 log.Fatalf("命令执行模式必须指定正确的漏洞编号")
+					 log.Fatalf("命令执行模式必须指定漏洞编号")
 				 default:
-
+					 log.Fatalf("命令执行模式必须指定漏洞编号")
 				 }
 			}else {
 				fmt.Println("参数错误")
