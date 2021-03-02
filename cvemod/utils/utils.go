@@ -165,6 +165,7 @@ func GetFunc4Struts2(pUrl string, getParam string, st2Payload string) string {
 		Timeout:Timeout,
 	}
 	req, err := http.NewRequest("GET", pUrl, nil)
+	req.Header.Set("User-Agent", GlobalUserAgent)
 	if err != nil {
 		log.Fatal("Error reading request. ")
 	}
