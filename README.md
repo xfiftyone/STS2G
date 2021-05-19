@@ -29,7 +29,7 @@ USAGE:
    ST2SG --url http://xxxxxxx.com/test.action --vn 15 --mode scan
 
 AUTHOR:
-   x51 <x51enter@gmail.com>
+   x51
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
