@@ -36,7 +36,7 @@ func main() {
 		Authors: []*cli.Author{
 			&cli.Author{
 				Name:  "x51",
-				Email: "x51enter@gmail.com",
+				Email: "",
 			},
 		},
 		Flags: []cli.Flag {
